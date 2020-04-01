@@ -74,6 +74,7 @@
       "Intellisense"
     ]
   },
+  "enable_git_features": false,
   "need_generate_pdf_url_template": false,
   "targets": {},
   "dependent_packages": [
