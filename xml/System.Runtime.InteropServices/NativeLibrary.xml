@@ -73,7 +73,7 @@
         <summary>Gets the address of an exported symbol.</summary>
         <returns>The address of the symbol.</returns>
         <remarks>
-          <format type="text/markdown"><![CDATA[  
+          <format type="text/markdown"><![CDATA[
 
 This is a simple wrapper around OS calls and does not perform any name mangling.
 
@@ -144,11 +144,22 @@ This is a simple wrapper around OS calls and does not perform any name mangling.
         <summary>Provides a high-level API for loading a native library.</summary>
         <returns>The OS handle for the loaded library.</returns>
         <remarks>
-          <format type="text/markdown"><![CDATA[  
+          <format type="text/markdown"><![CDATA[
 
-Given a library name, this method searches specific paths based on the  runtime configuration, input parameters, and attributes of the calling assembly. If the `searchPath` parameter is non-null, the flags in this enumeration are used. Otherwise, the flags specified by the <xref:System.Runtime.InteropServices.DefaultDllImportSearchPathsAttribute> on the calling assembly, if any are present, are used. This method does not invoke the following managed callbacks for native library resolution: 
+Given a library name, this method searches specific paths based on the  runtime configuration, input parameters, and attributes of the calling assembly. If the `searchPath` parameter is non-null, the flags in this enumeration are used. Otherwise, the flags specified by the <xref:System.Runtime.InteropServices.DefaultDllImportSearchPathsAttribute> on the calling assembly, if any are present, are used.
 
-- The per-assembly registered callback.
+In .NET 5 and above, this method follows the native resolution logic of the <xref:System.Runtime.Loader.AssemblyLoadContext> of the specified assembly. It invokes the following extension points:
+
+- The <xref:System.Runtime.Loader.AssemblyLoadContext.LoadUnmanagedDll%2A?displayProperty=nameWithType> method.
+- The <xref:System.Runtime.Loader.AssemblyLoadContext.ResolvingUnmanagedDll?displayProperty=nameWithType> event.
+
+It does not invoke:
+
+- The per-assembly registered <xref:System.Runtime.InteropServices.DllImportResolver> callback.
+
+In .NET 3.0 and 3.1, this method does *not* invoke the following managed callbacks for native library resolution:
+
+- The per-assembly registered <xref:System.Runtime.InteropServices.DllImportResolver> callback.
 - The <xref:System.Runtime.Loader.AssemblyLoadContext.LoadUnmanagedDll%2A?displayProperty=nameWithType> method.
 - The <xref:System.Runtime.Loader.AssemblyLoadContext.ResolvingUnmanagedDll?displayProperty=nameWithType> event.
 
@@ -188,16 +199,16 @@ Given a library name, this method searches specific paths based on the  runtime 
         <param name="resolver">The resolver callback to register.</param>
         <summary>Sets a callback for resolving native library imports from an assembly.</summary>
         <remarks>
-          <format type="text/markdown"><![CDATA[  
+          <format type="text/markdown"><![CDATA[
 
-This per-assembly resolver is the first attempt to resolve native library loads initiated by this assembly. 
+This per-assembly resolver is the first attempt to resolve native library loads initiated by this assembly.
 
 Only one resolver can be registered per assembly. Trying to register a second resolver fails with an <xref:System.InvalidOperationException>.
 
          ]]></format>
         </remarks>
         <exception cref="T:System.ArgumentNullException">
-          <paramref name="assembly" /> or paramref name="resolver" /&gt; is <see langword="null" />.</exception>
+          <paramref name="assembly" /> or <paramref name="resolver" /> is <see langword="null" />.</exception>
         <exception cref="T:System.ArgumentException">A resolver is already set for this assembly.</exception>
       </Docs>
     </Member>
@@ -298,7 +309,27 @@ Only one resolver can be registered per assembly. Trying to register a second re
         <summary>Provides a high-level API that loads a native library and returns a value that indicates whether the operation succeeded.</summary>
         <returns>
           <see langword="true" /> if the load operation was successful; otherwise, <see langword="false" />.</returns>
-        <remarks>To be added.</remarks>
+        <remarks>
+          <format type="text/markdown"><![CDATA[
+
+Given a library name, this method searches specific paths based on the  runtime configuration, input parameters, and attributes of the calling assembly. If the `searchPath` parameter is non-null, the flags in this enumeration are used. Otherwise, the flags specified by the <xref:System.Runtime.InteropServices.DefaultDllImportSearchPathsAttribute> on the calling assembly, if any are present, are used.
+
+In .NET 5 and above, this method follows the native resolution logic of the <xref:System.Runtime.Loader.AssemblyLoadContext> of the specified assembly. It invokes the following extension points:
+
+- The <xref:System.Runtime.Loader.AssemblyLoadContext.LoadUnmanagedDll%2A?displayProperty=nameWithType> method.
+- The <xref:System.Runtime.Loader.AssemblyLoadContext.ResolvingUnmanagedDll?displayProperty=nameWithType> event.
+
+It does not invoke:
+- The per-assembly registered <xref:System.Runtime.InteropServices.DllImportResolver> callback.
+
+In .NET 3.0 and 3.1, this method does *not* invoke the following managed callbacks for native library resolution:
+
+- The per-assembly registered <xref:System.Runtime.InteropServices.DllImportResolver> callback.
+- The <xref:System.Runtime.Loader.AssemblyLoadContext.LoadUnmanagedDll%2A?displayProperty=nameWithType> method.
+- The <xref:System.Runtime.Loader.AssemblyLoadContext.ResolvingUnmanagedDll?displayProperty=nameWithType> event.
+
+         ]]></format>
+        </remarks>
         <exception cref="T:System.ArgumentNullException">
           <paramref name="libraryPath" /> or <paramref name="assembly" /> is <see langword="null" />.</exception>
         <exception cref="T:System.ArgumentException">
